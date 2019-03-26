@@ -27,6 +27,9 @@
 </template>
 
 <script>
+var os = require("os");
+var fs = require("fs");
+var path = require("path");
 export default {
   name: "landing-page",
   data() {
@@ -52,11 +55,35 @@ export default {
           contentld: contentld
         },
         data => {
+          // 取消loading
+          this.loading = false;
+
+          var seats;
+          var homedir = os.homedir();
+          var seatshomedir = path.join(homedir, "seats");
+          if (!fs.existsSync(seatshomedir)) {
+            fs.mkdirSync(seatshomedir);
+          }
+          var cacheData = path.join(seatshomedir, contentld + ".json");
           if (data.status != 200) {
             this.$CC.showTip("error", "错误提示", data.msg);
-            return;
+            if (fs.existsSync(cacheData)) {
+              var seats_Buf = fs.readFileSync(cacheData);
+              var seats_Str = seats_Buf.toString();
+              var seats_Json = JSON.parse(seats_Str);
+              seats = seats_Json;
+            } else {
+              return;
+            }
+          } else {
+            seats = data.data;
+            var seats_Str = JSON.stringify(seats);
+            fs.writeFile(cacheData, seats_Str, err => {
+              console.log(err);
+            });
           }
-          var seats = data.data;
+
+          console.log(seats);
           var tempTableData = [];
           var w = 55;
           var h = 25;
@@ -68,7 +95,7 @@ export default {
             tempTableData.push(arr);
           }
 
-          var state_colors_copy = JSON.parse(JSON.stringify(this.state_colors));
+          var state_colors_copy = this.$Util.clone(this.state_colors);
           for (var i = 0; i < seats.length; i++) {
             var seat = seats[i];
             var x = parseInt(seat.x / 2);
@@ -86,9 +113,6 @@ export default {
 
           // 设置表1的值
           this.option_01 = state_colors_copy;
-
-          // 取消loading
-          this.loading = false;
         },
         userInfos_Temp[0].sno
       );
@@ -102,9 +126,15 @@ export default {
       var id = this.rooms[tab.index].id;
       this.generateRoomDraw(id);
     },
-    clipboard(id,title){
-      this.$electron.clipboard.writeText(id);
-      this.$CC.showTip("success","温馨提示","已将座位号("+title+")的id("+id+")写入剪切板");
+    clipboard(id, title) {
+      if (id && typeof id == "string") {
+        this.$electron.clipboard.writeText(id);
+        this.$CC.showTip(
+          "success",
+          "温馨提示",
+          "已将座位号(" + title + ")的id(" + id + ")写入剪切板"
+        );
+      }
     }
   },
   // 指令的定义
@@ -142,9 +172,8 @@ export default {
     this.state_colors = this.$Util.clone(this.$Resouce.state_colors);
 
     // 初始化第一个自习室
-    var id = this.rooms[0].id;
-    this.generateRoomDraw(id);
-
+    // var id = this.rooms[0].id;
+    // this.generateRoomDraw(id);
   }
 };
 </script>

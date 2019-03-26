@@ -114,8 +114,8 @@ function grabSeat(task) {
     }
 }
 
-function dealBookList(booklist,name_Temp){
-    console.log(name_Temp,booklist);
+function dealBookList(booklist, name_Temp) {
+    console.log(name_Temp, booklist);
     for (var i = 0; i < booklist.length; i++) {
         var book_Temp = booklist[i];
         if (book_Temp.status == 0) {
@@ -146,17 +146,17 @@ function notNoSign(task) {
     var nowDate = new Date();
     var nowTime = parseInt(nowDate.getTime() / 1000);
 
-    if(nowTime == oldTime){
+    if (nowTime == oldTime) {
         return;
     }
     oldTime = nowTime;
 
     var name_Temp = task.name;
     if ((nowTime % task.time) == 0) {
-        CC.myBookingList(null, data => {
+        CC.myBookingList({ "1": 1 }, data => {
             if (data.status == 200) {
                 var booklist = data.data;
-                dealBookList(booklist,name_Temp);
+                dealBookList(booklist, name_Temp);
             } else {
                 CC.showTip("error", "失败提示", "获取预约列表错误");
             }
@@ -164,7 +164,7 @@ function notNoSign(task) {
     }
 
     if ((nowTime % 60) == 0) {
-        
+
         for (var i = 0, len = bookLists.length; i < len; i++) {
             var book_Temp = bookLists[i];
             if (book_Temp.timeRemaining <= 5) {
@@ -173,7 +173,7 @@ function notNoSign(task) {
                     "1": book_Temp.id
                 }, data => {
                     if (data.status == 200) {
-                        bookLists.splice(i_Temp,1);
+                        bookLists.splice(i_Temp, 1);
                         CC.showTip("success", "成功提示", book_Temp.roomName + ",座位号：" + book_Temp.seatNum + ",未签到已帮您取消");
                     } else {
                         CC.showTip("error", "失败提示", data.msg);

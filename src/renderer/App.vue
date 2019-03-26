@@ -8,20 +8,21 @@
       text-color="#fff"
       active-text-color="#ffd04b"
     >
-      <el-menu-item index="1">用户信息</el-menu-item>
-      <el-menu-item index="2">任务信息</el-menu-item>
-      <el-menu-item index="3">数据可视化</el-menu-item>
+      <el-menu-item index="1"><router-link to="/" style="text-decoration: none;">用户信息</router-link></el-menu-item>
+      <el-menu-item index="2"><router-link to="/task">任务信息</router-link></el-menu-item>
+      <el-menu-item index="3"><router-link to="/data">数据可视化</router-link></el-menu-item>
     </el-menu>
-      <User v-show="comName == 'User'" key="User"/>
+      <!-- <User v-show="comName == 'User'" key="User"/>
       <Task v-show="comName == 'Task'" key="Task"/>
-      <Data v-show="comName == 'Data'" key="Data"/>
+      <Data v-show="comName == 'Data'" key="Data"/> -->
+      <router-view/>
   </div>
 </template>
 
 <script>
-var User = require("@/components/User").default;
-var Task = require("@/components/Task").default;
-var Data = require("@/components/Data").default;
+// var User = require("@/components/User").default;
+// var Task = require("@/components/Task").default;
+// var Data = require("@/components/Data").default;
 export default {
   name: "seat",
   data() {
@@ -29,11 +30,11 @@ export default {
       comName: "User"
     };
   },
-  components: {
-    User,
-    Task,
-    Data
-  },
+  // components: {
+  //   User:
+  //   Task:
+  //   Data:
+  // },
   methods: {
     handleSelect(key, keyPath) {
       if (key == "1") {
@@ -59,6 +60,7 @@ body {
   margin: 0px;
   padding: 0px;
   background: #fafafa;
+  
 }
 
 

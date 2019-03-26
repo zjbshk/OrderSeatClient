@@ -4,7 +4,7 @@
       <i class="el-icon-edit" title="编辑" @click="editUser"></i>
       <i class="el-icon-circle-plus-outline" title="添加" @click="addUser"></i>
       <i class="el-icon-zoom-in" @click="checkUseful()" title="检测账号是否可用"></i>
-      <i class="el-icon-delete" style="color:red" title="删除账号" @click="delUser"></i>
+      <i class="el-icon-delete" style="color:red" title="删除账号" @click="show_DelUserPane"></i>
       <i class="el-icon-refresh" style="color:red" title="刷新信息" @click="refreshInfo()"></i>
       <i class="el-icon-time" style="color:#3D9AF9;" title="预约详情" @click="showNoSign"></i>
       <i class="el-icon-mobile-phone" style="color:#3D9AF9" title="登录账号" @click="loginUser"></i>
@@ -86,6 +86,14 @@
         </el-table-column>
       </el-table>
     </div>
+
+    <el-dialog title="提示" :visible.sync="dialogVisible" width="20%">
+      <span>此操作将会删除该用户信息，是否继续？</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button size="small" @click="dialogVisible = false">取 消</el-button>
+        <el-button size="small" type="primary" @click="delUser">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -102,6 +110,7 @@ export default {
       form_title: true,
       show_form: false,
       show_bookList: false,
+      dialogVisible: false,
       blankUserInfo: {},
       userInfo: {},
       rules: {
@@ -109,7 +118,7 @@ export default {
           { required: true, message: "学号不能为空", trigger: "blur" },
           { min: 6, max: 12, message: "长度在 6 到 12 个字符", trigger: "blur" }
         ],
-        sname: [{ required: true, message: "姓名不能为空", trigger: "blur" }],
+        name: [{ required: true, message: "姓名不能为空", trigger: "blur" }],
         password: [
           { required: true, message: "密码不能为空", trigger: "blur" }
         ],
@@ -151,21 +160,29 @@ export default {
         });
       }
     },
-    delUser() {
+    show_DelUserPane() {
       if (this.checkSelect()) {
-        this.$confirm("此操作将删除该用户信息, 是否继续?", "提示", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        })
-          .then(() => {
-            var index = this.tableData.indexOf(this.currentRow);
-            this.tableData.splice(index, 1);
-            this.currentRow = null;
-            this.saveUserInfo();
-          })
-          .catch(() => {});
+        this.dialogVisible = !this.dialogVisible;
       }
+    },
+    delUser() {
+      this.dialogVisible = false;
+      var index = this.tableData.indexOf(this.currentRow);
+      this.tableData.splice(index, 1);
+      this.currentRow = null;
+      this.saveUserInfo();
+      // this.$confirm("此操作将删除该用户信息, 是否继续?", "提示", {
+      //   confirmButtonText: "确定",
+      //   cancelButtonText: "取消",
+      //   type: "warning"
+      // })
+      //   .then(() => {
+      //     var index = this.tableData.indexOf(this.currentRow);
+      //     this.tableData.splice(index, 1);
+      //     this.currentRow = null;
+      //     this.saveUserInfo();
+      //   })
+      //   .catch(() => {});
     },
     editUser() {
       if (this.checkSelect()) {
@@ -245,7 +262,7 @@ export default {
       }
 
       this.$CC.myBookingList(
-        null,
+        { "1": 1 },
         data => {
           var waitSign = 0;
           var duration = 0;
@@ -309,7 +326,7 @@ export default {
     },
     showNoSign() {
       if (this.checkSelect()) {
-        this.bookList.splice(0,this.bookList.length);
+        this.bookList.splice(0, this.bookList.length);
         for (var i = 0, len = this.bookLists.length; i < len; i++) {
           if (this.currentRow.name == this.bookLists[i].name) {
             this.bookList.push(this.bookLists[i]);

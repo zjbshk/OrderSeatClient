@@ -1,12 +1,17 @@
 import Vue from 'vue'
 import axios from 'axios'
 
-import App from './App'
-
-
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
+
+import App from './App'
+import router from './router'
+
 Vue.use(ElementUI)
+
+
+
+
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios
@@ -29,8 +34,13 @@ Dt.setUtil(Util)
 import * as Echarts from 'echarts'
 Vue.prototype.$Echarts = Echarts
 
+
+
+
+
 /* eslint-disable no-new */
 new Vue({
   components: { App },
+  router,
   template: '<App/>'
 }).$mount('#app')
